@@ -1,11 +1,11 @@
 # Sentiment Classification API (v2 — FastAPI + JWT)
 
-A REST API rebuild of my original Flask customer review sentiment classifier — same trained
+A REST API rebuild of my original Flask customer review sentiment classifier, same trained
 Naive Bayes model and Indonesian text preprocessing pipeline, now served through a proper
 REST layer with JWT authentication, request/response validation, auto-generated docs, and
 Docker support.
 
-**Original Flask version (v1, built for my thesis):** `[add link to your v1 repo here]`
+**Original Flask version (v1, built for my thesis):** `github.com/dmsfzn/Tugas-Akhir`
 
 This project doesn't retrain or change the model — it re-engineers how the model is *served*.
 The dataset, the trained Naive Bayes model, and the 85.6% accuracy result all carry over
