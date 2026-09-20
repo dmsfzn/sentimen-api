@@ -6,7 +6,8 @@ REST layer with JWT authentication, request/response validation, auto-generated 
 Docker support.
 
 **Original Flask version (v1, built for my thesis):**
-[![GitHub repo](https://img.shields.io/badge/GitHub-dmsfzn%2Fsentimen--api-blue?style=for-the-badge&logo=github)](https://github.com/dmsfzn/Tugas_Akhir)
+
+[![GitHub repo](https://img.shields.io/badge/GitHub-dmsfzn%2FTugas--Akhir-blue?style=for-the-badge&logo=github)](https://github.com/dmsfzn/Tugas_Akhir)
 
 This project doesn't retrain or change the model — it re-engineers how the model is *served*.
 The dataset, the trained Naive Bayes model, and the 85.6% accuracy result all carry over
