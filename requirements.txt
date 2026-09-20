@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pymysql
+joblib
+scikit-learn
+Sastrawi
+git+https://github.com/Malykz/stemmid
+python-jose[cryptography]
+bcrypt
+python-multipart
+pydantic[email]
+python-dotenv
