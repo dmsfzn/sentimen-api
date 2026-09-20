@@ -1,4 +1,5 @@
 import os
+import re
 from typing import List, Tuple
 
 import joblib
@@ -15,6 +16,7 @@ router = APIRouter(prefix="/predict", tags=["predict"])
 
 _stemmer = Stemmer()
 _stopword_remover = StopWordRemoverFactory().create_stop_word_remover()
+_elongation_pattern = re.compile(r"(.)\1+")
 
 # Drop your two exported files here: ml/naive_bayes_model.pkl and ml/vectorizer.pkl
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # sentiment-api-starter/
@@ -31,17 +33,36 @@ except FileNotFoundError:
     vectorizer = None
 
 
+def normalize_elongation(text: str) -> str:
+    """
+    Collapses repeated characters used for emphasis in informal text, e.g.
+    "mantapp" -> "mantap", "kerennnn" -> "keren". Without this, slang spellings
+    are treated as unknown words and the model gets no signal from them at all.
+
+    Trade-off: a small number of real Indonesian words with a genuine double
+    letter also get collapsed, e.g. "maaf" -> "maf", "saat" -> "sat". These
+    aren't strong sentiment words, so the effect on classification should be
+    minor, but it's not zero.
+    """
+    return _elongation_pattern.sub(r"\1", text)
+
+
 def preprocess_text(text: str) -> str:
     """
-    Mirrors the pipeline in your Flask preprocess_data module:
-    lowercase -> remove stopwords (Sastrawi) -> stem (stemmid).
+    Mirrors the pipeline in your Flask preprocess_data module, plus one
+    addition (elongation normalization) that runs only at prediction time —
+    it doesn't change what the vectorizer/model learned, it just helps new
+    input map onto vocabulary the model already knows:
+
+    lowercase -> normalize elongation -> remove stopwords (Sastrawi) -> stem (stemmid)
 
     ASSUMPTION: stopwords removed BEFORE stemming. If your original code did
-    it the other way around (stem first, then remove stopwords), swap the
+    it the other way around (stem first, then remove stopwords), swap those
     two lines below — the order has to match exactly or the vectorizer's
     vocabulary won't line up with what you send it here.
     """
     text = text.lower()                       # stemmid only stems lowercase input reliably
+    text = normalize_elongation(text)          # "mantapp" -> "mantap"
     text = _stopword_remover.remove(text)      # drop "yang", "dan", "di", etc.
     text = _stemmer.loads(text)                # reduce remaining words to root form
     return text
@@ -50,7 +71,7 @@ def preprocess_text(text: str) -> str:
 def classify_sentiment(text: str) -> Tuple[str, str]:
     if model is None or vectorizer is None:
         sentiment = "positive" if "good" in text.lower() else "negative"
-        return sentiment, "n/a (model not loaded — add ml/*.pkl files)"
+        return sentiment, "n/a (no model)"
 
     cleaned = preprocess_text(text)
     vec = vectorizer.transform([cleaned])
